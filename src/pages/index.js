@@ -1,0 +1,7 @@
+export * from "./Dashboard"
+export * from "./Login"
+export * from "./Register"
+export * from "./Home"
+export * from "./Historial"
+export * from "./SelectRol"
+export * from "./Perfil"
