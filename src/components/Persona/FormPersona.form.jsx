@@ -7,6 +7,8 @@ export function InitialValues(datosPerson) {
     correo: datosPerson?.correo || "",
     nomuser: datosPerson?.nomuser || "",
     especialidad: datosPerson?.especialidad || "",
+    password: datosPerson?.password || "1234",
+    rol: datosPerson?.rol || "tecnico"
   }
 }
 
