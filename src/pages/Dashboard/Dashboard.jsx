@@ -1,3 +1,5 @@
+import { useContext } from "react"
+import { AuthContext } from "../../context/AuthContext"
 import { Trash, Pencil, Clock, Activity, CheckCircle } from 'lucide-react'
 import { useState, useEffect } from "react"
 import ApiDatos from "../../services/ApiDatos"
@@ -11,15 +13,18 @@ export function Dashboard() {
   const [datos, setDatos] = useState([]);
   const [servicios, setServicios] = useState([]);
   const [open, setOpen] = useState(false);
-
+const { usuario } = useContext(AuthContext)
   const navigate = useNavigate();
   const handleOpen = () => { setOpen(!open) };
 
   const datosBd = async () => {
-    const datosbd = await ApiDatos.getDatos();
-    setDatos(datosbd.data);
-    console.log(datosbd.data);
-  }
+  const datosbd = await ApiDatos.getDatos();
+  // Solo trabajadores (rol tecnico) excluyendo al admin logueado
+  const soloTecnicos = datosbd.data.filter(
+    (p) => p.rol === "tecnico" && p._id !== usuario?.id
+  );
+  setDatos(soloTecnicos);
+}
 
   // Traemos los servicios para contar los estados
   const serviciosBd = async () => {

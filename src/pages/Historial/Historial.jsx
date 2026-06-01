@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { CheckCircle, Clock, Activity, Trash } from "lucide-react"
 import ApiDatos from "../../services/ApiDatos"
+import { AuthContext } from "../../context/AuthContext"
 import Swal from "sweetalert2"
 
 export function Historial() {
@@ -9,6 +10,7 @@ export function Historial() {
 
   // Leemos el rol para saber qué mostrar
   const rol = localStorage.getItem("rol")
+  const { usuario } = useContext(AuthContext)
 
   const obtenerServicios = async () => {
     const respuesta = await ApiDatos.getServicios()
@@ -16,10 +18,14 @@ export function Historial() {
     console.log(respuesta.data)
   }
 
-  const obtenerTrabajadores = async () => {
-    const respuesta = await ApiDatos.getDatos()
-    setTrabajadores(respuesta.data)
-  }
+const obtenerTrabajadores = async () => {
+  const respuesta = await ApiDatos.getDatos()
+  // Solo personas con rol "tecnico", excluyendo al admin logueado
+  const soloTecnicos = respuesta.data.filter(
+    (p) => p.rol === "tecnico" && p._id !== usuario?.id
+  )
+  setTrabajadores(soloTecnicos)
+}
 
   useEffect(() => {
     obtenerServicios()

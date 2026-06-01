@@ -1,4 +1,4 @@
-import { createContext, useState } from "react"
+import { createContext, useState, useEffect } from "react"
 
 // Creamos el contexto
 export const AuthContext = createContext()
@@ -6,6 +6,14 @@ export const AuthContext = createContext()
 // El proveedor que envuelve la app
 export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null)
+
+  // Al cargar la app, recuperamos al usuario del localStorage (si existe)
+  useEffect(() => {
+    const usuarioGuardado = localStorage.getItem("usuario")
+    if (usuarioGuardado) {
+      setUsuario(JSON.parse(usuarioGuardado))
+    }
+  }, [])
 
   // Guardar el usuario al iniciar sesión
   const login = (datosUsuario) => {

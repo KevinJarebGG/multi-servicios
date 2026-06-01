@@ -11,16 +11,19 @@ export function Home() {
   const [direccion, setDireccion] = useState("")
   const [categoria, setCategoria] = useState("")
   const [fecha, setFecha] = useState("")
+  const [otroServicio, setOtroServicio] = useState("")
+const [otraCategoria, setOtraCategoria] = useState("")
   const [openDropdown, setOpenDropdown] = useState(null)
 
   const servicios = [
-    { id: "albañil", label: "Albañil", icon: <FaHammer size={18} /> },
-    { id: "electricista", label: "Electricista", icon: <FaBolt size={18} /> },
-    { id: "plomero", label: "Plomero", icon: <FaFaucet size={18} /> },
-    { id: "carpintero", label: "Carpintero", icon: <FaTree size={18} /> },
-  ]
+  { id: "albañil", label: "Albañil", icon: <FaHammer size={18} /> },
+  { id: "electricista", label: "Electricista", icon: <FaBolt size={18} /> },
+  { id: "plomero", label: "Plomero", icon: <FaFaucet size={18} /> },
+  { id: "carpintero", label: "Carpintero", icon: <FaTree size={18} /> },
+  { id: "otro", label: "Otro", icon: <FaChevronDown size={18} /> },
+]
 
-  const categorias = ["Reparación", "Instalación", "Mantenimiento", "Emergencia"]
+const categorias = ["Reparación", "Instalación", "Mantenimiento", "Emergencia", "Otro"]
 
   const toggleServicio = (id) => {
     setServicioSeleccionado((prev) =>
@@ -39,12 +42,20 @@ export function Home() {
     return (completos / total) * 100
 }
 
-  const handleSubmit = async () => {
+ const handleSubmit = async () => {
     if (servicioSeleccionado.length === 0) {
       return Swal.fire({ position: "top-end", icon: "error", title: "Selecciona al menos un servicio", showConfirmButton: false, timer: 1500 })
     }
+    // Si eligió "Otro" en servicios, debe escribir cuál
+    if (servicioSeleccionado.includes("otro") && !otroServicio) {
+      return Swal.fire({ position: "top-end", icon: "error", title: "Escribe cuál es el otro servicio", showConfirmButton: false, timer: 1500 })
+    }
     if (!categoria) {
       return Swal.fire({ position: "top-end", icon: "error", title: "Selecciona una categoría", showConfirmButton: false, timer: 1500 })
+    }
+    // Si eligió "Otro" en categoría, debe escribir cuál
+    if (categoria === "Otro" && !otraCategoria) {
+      return Swal.fire({ position: "top-end", icon: "error", title: "Escribe cuál es la otra categoría", showConfirmButton: false, timer: 1500 })
     }
     if (!descripcion) {
       return Swal.fire({ position: "top-end", icon: "error", title: "Escribe una descripción", showConfirmButton: false, timer: 1500 })
@@ -57,9 +68,13 @@ export function Home() {
     }
 
     try {
+      // Si eligió "Otro", reemplazamos por lo que escribió
+      const serviciosFinales = servicioSeleccionado.map((s) => s === "otro" ? otroServicio : s)
+      const categoriaFinal = categoria === "Otro" ? otraCategoria : categoria
+
       const data = {
-        servicios: servicioSeleccionado,
-        categoria,
+        servicios: serviciosFinales,
+        categoria: categoriaFinal,
         descripcion,
         direccion,
         fecha,
@@ -71,6 +86,8 @@ export function Home() {
       setDescripcion("")
       setDireccion("")
       setFecha("")
+      setOtroServicio("")
+      setOtraCategoria("")
       navigate("/historial")
     } catch (error) {
       Swal.fire({ position: "top-end", icon: "error", title: "Error al enviar la solicitud", showConfirmButton: false, timer: 1500 })
@@ -139,7 +156,19 @@ export function Home() {
           </div>
         )}
       </div>
-
+{/* Campo "Otro servicio" - solo aparece si eligió Otro */}
+      {servicioSeleccionado.includes("otro") && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+          <h2 className="font-bold text-slate-700">¿Cuál otro servicio necesitas?</h2>
+          <input
+            type="text"
+            value={otroServicio}
+            onChange={(e) => setOtroServicio(e.target.value)}
+            placeholder="Ej: Jardinero, Cerrajero..."
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+        </div>
+      )}
       {/* Categoría */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
         <h2 className="font-bold text-slate-700">Categoría</h2>
@@ -172,7 +201,19 @@ export function Home() {
           )}
         </div>
       </div>
-
+{/* Campo "Otra categoría" - solo aparece si eligió Otro */}
+      {categoria === "Otro" && (
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+          <h2 className="font-bold text-slate-700">¿Cuál otra categoría es?</h2>
+          <input
+            type="text"
+            value={otraCategoria}
+            onChange={(e) => setOtraCategoria(e.target.value)}
+            placeholder="Ej: Limpieza, Pintura..."
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          />
+        </div>
+      )}
       {/* Descripción */}
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 space-y-4">
         <h2 className="font-bold text-slate-700">Descripción</h2>
